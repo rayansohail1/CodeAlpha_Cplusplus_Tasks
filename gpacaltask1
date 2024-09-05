@@ -1,0 +1,74 @@
+#include <iostream>
+#include <vector>
+#include <iomanip>
+
+using namespace std;
+
+struct Course {
+    string name;
+    int credits;
+    char grade;
+};
+
+class CGPACalculator {
+private:
+    vector<Course> courses;
+    int totalCredits;
+    double totalGradePoints;
+
+public:
+    void addCourse() {
+        Course course;
+        cout << "Enter course name: ";
+        cin >> course.name;
+        cout << "Enter course credits: ";
+        cin >> course.credits;
+        cout << "Enter course grade (A, B, C, D, F): ";
+        cin >> course.grade;
+        courses.push_back(course);
+        totalCredits += course.credits;
+        totalGradePoints += getGradePoints(course.grade) * course.credits;
+    }
+
+    double calculateGPA() {
+        return totalGradePoints / totalCredits;
+    }
+
+    double calculateCGPA() {
+        return calculateGPA();
+    }
+
+    void displayResults() {
+        cout << "Course\t\tCredits\tGrade\tGrade Points" << endl;
+        for (const auto& course : courses) {
+            cout << course.name << "\t" << course.credits << "\t" << course.grade << "\t" << getGradePoints(course.grade) * course.credits << endl;
+        }
+        cout << "Total\t\t" << totalCredits << "\t\t" << fixed << setprecision(2) << totalGradePoints << endl;
+        cout << "GPA: " << calculateGPA() << endl;
+        cout << "CGPA: " << calculateCGPA() << endl;
+    }
+
+private:
+    double getGradePoints(char grade) {
+        switch (grade) {
+            case 'A': return 4.0;
+            case 'B': return 3.0;
+            case 'C': return 2.0;
+            case 'D': return 1.0;
+            case 'F': return 0.0;
+            default: return 0.0;
+        }
+    }
+};
+
+int main() {
+    CGPACalculator calculator;
+    int numCourses;
+    cout << "Enter the number of courses: ";
+    cin >> numCourses;
+    for (int i = 0; i < numCourses; i++) {
+        calculator.addCourse();
+    }
+    calculator.displayResults();
+    return 0;
+}

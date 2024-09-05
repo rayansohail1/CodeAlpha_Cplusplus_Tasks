@@ -1,0 +1,88 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+struct User {
+    string username;
+    string password;
+};
+
+bool registerUser(vector<User>& users, User& newUser) {
+    // Check if username already exists
+    for (const User& user : users) {
+        if (user.username == newUser.username) {
+            cout << "Username already exists.\n";
+            return false;
+        }
+    }
+
+    // Add new user to the vector
+    users.push_back(newUser);
+
+    // Save user data to a file (optional)
+    ofstream file("users.txt", ios::app);
+    if (file.is_open()) {
+        file << newUser.username << " " << newUser.password << endl;
+        file.close();
+        cout << "Registration successful.\n";
+        return true;
+    } else {
+        cout << "Error saving user data.\n";
+        return false;
+    }
+}
+
+bool loginUser(const vector<User>& users, const string& username, const string& password) {
+    for (const User& user : users) {
+        if (user.username == username && user.password == password) {
+            cout << "Login successful.\n";
+            return true;
+        }
+    }
+    cout << "Invalid username or password.\n";
+    return false;
+}
+
+int main() {
+    vector<User> users;
+
+    char choice;
+    do {
+        cout << "1. Register\n";
+        cout << "2. Login\n";
+        cout << "3. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case '1': {
+                User newUser;
+                cout << "Enter username: ";
+                cin >> newUser.username;
+                cout << "Enter password: ";
+                cin >> newUser.password;
+                registerUser(users, newUser);
+                break;
+            }
+            case '2': {
+                string username, password;
+                cout << "Enter username: ";
+                cin >> username;
+                cout << "Enter password: ";
+                cin >> password;
+                loginUser(users, username, password);
+                break;
+            }
+            case '3':
+                cout << "Exiting...\n";
+                break;
+            default:
+                cout << "Invalid choice.\n";
+        }
+    } while (choice != '3');
+
+    return 0;
+}

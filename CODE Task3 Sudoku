@@ -1,0 +1,132 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+
+const int N = 9;
+
+// Function to print the Sudoku grid
+void printGrid(const vector<vector<int>>& grid) {
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            cout << grid[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
+
+// Function to check if a number is safe to place at a given position
+bool isSafe(const vector<vector<int>>& grid, int row, int col, int num) {
+    // Check row
+    for (int i = 0; i < N; i++) {
+        if (grid[row][i] == num) {
+            return false;
+        }
+    }
+
+    // Check column
+    for (int i = 0; i < N; i++) {
+        if (grid[i][col] == num) {
+            return false;
+        }
+    }
+
+    // Check 3x3 subgrid
+    int startRow = row - row % 3;
+    int startCol = col - col % 3;
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            if (grid[startRow + i][startCol + j] == num) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+// Function to solve the Sudoku puzzle using backtracking
+bool solveSudoku(vector<vector<int>>& grid) {
+    // Find the first empty cell
+    int row, col;
+    bool found = false;
+    for (row = 0; row < N; row++) {
+        for (col = 0; col < N; col++) {
+            if (grid[row][col] == 0) {
+                found = true;
+                break;
+            }
+        }
+        if (found) {
+            break;
+        }
+    }
+
+    // If no empty cell is found, the puzzle is solved
+    if (!found) {
+        return true;
+    }
+
+    // Try placing numbers from 1 to 9
+    for (int num = 1; num <= N; num++) {
+        if (isSafe(grid, row, col, num)) {
+            grid[row][col] = num;
+
+            // Recursively solve the puzzle
+            if (solveSudoku(grid)) {
+                return true;
+            }
+
+            // If the current placement doesn't lead to a solution, backtrack
+            grid[row][col] = 0;
+        }
+    }
+
+    return false;
+}
+
+// Function to generate a Sudoku puzzle with a given difficulty level
+vector<vector<int>> generateSudoku(int difficulty) {
+    vector<vector<int>> grid(N, vector<int>(N, 0));
+
+    // Generate a complete Sudoku puzzle
+    solveSudoku(grid);
+
+    // Remove cells based on the difficulty level
+    srand(time(0));
+    int cellsToRemove = difficulty * N * N / 10;
+    while (cellsToRemove > 0) {
+        int row = rand() % N;
+        int col = rand() % N;
+        if (grid[row][col] != 0) {
+            grid[row][col] = 0;
+            cellsToRemove--;
+        }
+    }
+
+    return grid;
+}
+
+// Main function
+int main() {
+    int difficulty;
+    cout << "Enter difficulty level (1-9): ";
+    cin >> difficulty;
+
+    vector<vector<int>> grid = generateSudoku(difficulty);
+
+    cout << "Generated Sudoku puzzle:\n";
+    printGrid(grid);
+
+    if (solveSudoku(grid)) {
+        cout << "\nSolved Sudoku puzzle:\n";
+        printGrid(grid);
+    } else {
+        cout << "\nNo solution found.\n";
+    }
+
+    return 0;
+}
